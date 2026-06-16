@@ -6,16 +6,16 @@ import Quiz from '../components/Quiz'
 function lerp(a: number, b: number, t: number) { return a + (b - a) * t }
 
 function tempColor(c: number): string {
-  const t = Math.max(0, Math.min(1, (c + 50) / 200))
-  const r = Math.round(lerp(100, 255, t))
-  const g = Math.round(lerp(180, 80, t))
-  const b = Math.round(lerp(255, 40, t))
+  const t = Math.max(0, Math.min(1, (c + 100) / 600))
+  const r = Math.round(lerp(50, 220, t))
+  const g = Math.round(lerp(100, 60, t))
+  const b = Math.round(lerp(200, 30, t))
   return `rgb(${r},${g},${b})`
 }
 
 function ThermometerSVG({ celsius }: { celsius: number }) {
   const W = 160, H = 300
-  const tubeX = 70, tubeW = 20, tubeTop = 30, tubeBottom = 240
+  const tubeX = 65, tubeW = 22, tubeTop = 30, tubeBottom = 240
   const tubeH = tubeBottom - tubeTop
   const minC = -100, maxC = 500
   const clampedC = Math.max(minC, Math.min(maxC, celsius))
@@ -27,12 +27,12 @@ function ThermometerSVG({ celsius }: { celsius: number }) {
   const ticks: [number, string][] = [[-100,''], [0,'0°'], [100,'100°'], [200,'200°'], [300,'300°'], [400,'400°'], [500,'']]
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="sim-svg" style={{ maxWidth: 200, margin: '0 auto', display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ maxWidth: 160, margin: '0 auto', display: 'block', background: '#f8fafc', borderRadius: 10, border: '1px solid #e0e4ea' }}>
       {/* bulb */}
-      <circle cx={tubeX + tubeW/2} cy={tubeBottom + 20} r={18} fill={color} stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+      <circle cx={tubeX + tubeW/2} cy={tubeBottom + 20} r={18} fill={color} stroke="rgba(0,0,0,0.15)" strokeWidth="1.5" />
       {/* tube outline */}
       <rect x={tubeX} y={tubeTop} width={tubeW} height={tubeH + 2} rx={tubeW/2}
-        fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+        fill="#e8edf5" stroke="#b0c0d8" strokeWidth="1.5" />
       {/* mercury fill */}
       {fillH > 0 && (
         <rect x={tubeX + 2} y={fillY} width={tubeW - 4} height={fillH}
@@ -44,8 +44,8 @@ function ThermometerSVG({ celsius }: { celsius: number }) {
         return (
           <g key={c}>
             <line x1={tubeX + tubeW} y1={y} x2={tubeX + tubeW + 8} y2={y}
-              stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-            {label && <text x={tubeX + tubeW + 12} y={y + 4} fill="var(--muted)" fontSize="9">{label}</text>}
+              stroke="#9aadcc" strokeWidth="1" />
+            {label && <text x={tubeX + tubeW + 12} y={y + 4} fill="#6b7280" fontSize="9">{label}</text>}
           </g>
         )
       })}
@@ -66,11 +66,11 @@ export default function TemperaturaCalore() {
 
   const notevoli: [number, string][] = [
     [-273.15, lang==='it'?'Zero assoluto':'Absolute zero'],
-    [-40, lang==='it'?'Punto di incontro °C/°F':'C/F meeting point'],
+    [-40, lang==='it'?'Punto incontro °C/°F':'C/F meeting point'],
     [0, lang==='it'?'Fusione acqua (1 atm)':'Water melting (1 atm)'],
     [20, lang==='it'?'Temperatura ambiente':'Room temperature'],
     [37, lang==='it'?'Temperatura corporea':'Body temperature'],
-    [100, lang==='it'?'Ebollizione acqua (1 atm)':'Water boiling (1 atm)'],
+    [100, lang==='it'?'Ebollizione acqua':'Water boiling'],
   ]
 
   return (
@@ -94,8 +94,8 @@ export default function TemperaturaCalore() {
         <div className="info-box example">
           <span className="info-box-icon">🌡️</span>
           <span>{lang==='it'
-            ? 'Temperature notevoli: corpo umano 37°C = 310 K = 98,6°F — ebollizione acqua 100°C = 373 K = 212°F — zero assoluto -273°C = 0 K = -459°F'
-            : 'Notable temperatures: human body 37°C = 310 K = 98.6°F — water boiling 100°C = 373 K = 212°F — absolute zero -273°C = 0 K = -459°F'}
+            ? 'Corpo umano: 37°C = 310 K = 98,6°F — Ebollizione acqua: 100°C = 373 K = 212°F — Zero assoluto: -273°C = 0 K = -459°F'
+            : 'Human body: 37°C = 310 K = 98.6°F — Water boiling: 100°C = 373 K = 212°F — Absolute zero: -273°C = 0 K = -459°F'}
           </span>
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function TemperaturaCalore() {
           <span className="ctrl-value">{celsius}°C</span>
         </div>
 
-        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap', marginTop: '0.75rem' }}>
           <ThermometerSVG celsius={celsius} />
           <div style={{ flex: 1, minWidth: 200 }}>
             <div className="readouts" style={{ gridTemplateColumns: '1fr' }}>
@@ -142,8 +142,8 @@ export default function TemperaturaCalore() {
                 <span className="readout-value">{fahrenheit.toFixed(1)} °F</span>
               </div>
             </div>
-            <div style={{ marginTop: '1rem' }}>
-              <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginBottom: '0.5rem' }}>
+            <div style={{ marginTop: '0.75rem' }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginBottom: '0.4rem' }}>
                 {lang==='it'?'Temperature notevoli:':'Notable temperatures:'}
               </p>
               {notevoli.map(([c, label]) => (
@@ -151,14 +151,14 @@ export default function TemperaturaCalore() {
                   onClick={() => setCelsius(Math.round(c))}
                   style={{
                     display: 'block', width: '100%', textAlign: 'left',
-                    background: Math.abs(celsius - c) < 1 ? 'rgba(255,112,67,0.15)' : 'transparent',
-                    border: '1px solid ' + (Math.abs(celsius - c) < 1 ? 'var(--primary)' : 'var(--border)'),
-                    borderRadius: 6, padding: '0.35rem 0.6rem', marginBottom: '0.3rem',
+                    background: Math.abs(celsius - c) < 1 ? 'var(--primary-light)' : '#fff',
+                    border: '1.5px solid ' + (Math.abs(celsius - c) < 1 ? 'var(--primary)' : 'var(--border)'),
+                    borderRadius: 6, padding: '0.32rem 0.7rem', marginBottom: '0.3rem',
                     cursor: 'pointer', fontSize: '0.82rem', color: 'var(--text)', fontFamily: 'inherit',
-                    transition: 'all 0.15s',
+                    transition: 'all 0.12s',
                   }}
                 >
-                  <span style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--primary)' }}>{c}°C</span>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--primary)', fontWeight: 700 }}>{c}°C</span>
                   {' '}— {label}
                 </button>
               ))}

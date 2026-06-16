@@ -6,14 +6,13 @@ import Quiz from '../components/Quiz'
 const C_ICE = 2.09
 const L_FUS = 334
 const C_WAT = 4.186
-const L_VAP = 2260
 const C_STE = 2.01
 const T0 = -40
 
-const Q1 = C_ICE * (0 - T0)  // 83.6 kJ — riscaldamento ghiaccio
-const Q2 = Q1 + L_FUS        // 417.6 kJ — fine fusione
-const Q3 = Q2 + C_WAT * 100  // 836.2 kJ — fine riscaldamento acqua
-const QMAX = Q3 + 100        // mostriamo fino a 936 kJ, inizio vaporizzazione
+const Q1 = C_ICE * (0 - T0)
+const Q2 = Q1 + L_FUS
+const Q3 = Q2 + C_WAT * 100
+const QMAX = Q3 + 100
 
 function tempFromQ(q: number): number {
   if (q <= 0) return T0
@@ -24,15 +23,15 @@ function tempFromQ(q: number): number {
 }
 
 function stateFromQ(q: number, lang: 'it' | 'en'): { label: string; icon: string; color: string } {
-  if (q < Q1) return { label: lang==='it'?'Ghiaccio (solido)':'Ice (solid)', icon: '🧧', color: '#90caf9' }
-  if (q < Q2) return { label: lang==='it'?'Fusione in corso...':'Melting...', icon: '🌊', color: '#fff176' }
-  if (q < Q3) return { label: lang==='it'?'Acqua (liquido)':'Water (liquid)', icon: '💧', color: '#4fc3f7' }
-  if (q < Q3 + L_VAP) return { label: lang==='it'?'Ebollizione in corso...':'Boiling...', icon: '♨️', color: '#ff7043' }
-  return { label: lang==='it'?'Vapore (gas)':'Steam (gas)', icon: '☁️', color: '#ce93d8' }
+  if (q < Q1) return { label: lang==='it'?'Ghiaccio (solido)':'Ice (solid)', icon: '🧧', color: '#1565c0' }
+  if (q < Q2) return { label: lang==='it'?'Fusione in corso...':'Melting...', icon: '🌊', color: '#f57c00' }
+  if (q < Q3) return { label: lang==='it'?'Acqua (liquido)':'Water (liquid)', icon: '💧', color: '#0277bd' }
+  if (q < Q3 + 2260) return { label: lang==='it'?'Ebollizione in corso...':'Boiling...', icon: '♨️', color: '#c62828' }
+  return { label: lang==='it'?'Vapore (gas)':'Steam (gas)', icon: '☁️', color: '#6a1b9a' }
 }
 
 function MoleculesSVG({ q }: { q: number }) {
-  const W = 200, H = 100
+  const W = 260, H = 100
   const state = q < Q1 ? 'solid' : q < Q2 ? 'melt' : q < Q3 ? 'liquid' : 'gas'
 
   const molecules = useMemo(() => {
@@ -40,7 +39,7 @@ function MoleculesSVG({ q }: { q: number }) {
     return Array.from({ length: n }, (_, i) => {
       if (state === 'solid') {
         const col = i % 4, row = Math.floor(i / 4)
-        return { x: 30 + col * 42, y: 20 + row * 35 }
+        return { x: 40 + col * 48, y: 18 + row * 36 }
       }
       const seed = i * 137.5
       return {
@@ -50,31 +49,24 @@ function MoleculesSVG({ q }: { q: number }) {
     })
   }, [state])
 
-  const color = state === 'solid' ? '#90caf9' : state === 'liquid' ? '#4fc3f7' : '#ff7043'
-  const r = state === 'gas' ? 6 : 5
+  const colors: Record<string, string> = { solid: '#1565c0', melt: '#f57c00', liquid: '#0277bd', gas: '#c62828' }
+  const color = colors[state]
+  const r = state === 'gas' ? 7 : 6
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="sim-svg" style={{ maxHeight: 120 }}>
-      <rect x={0} y={0} width={W} height={H} rx={8} fill="rgba(0,0,0,0.4)" />
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: '#f8fafc', borderRadius: 8, border: '1px solid #e0e4ea', display: 'block', width: '100%', margin: '0.5rem 0' }}>
       {molecules.map((m, i) => (
         <g key={i}>
-          <circle cx={m.x} cy={m.y} r={r}
-            fill={color} opacity={0.85}
-            style={{
-              animation: state === 'solid'
-                ? `vibrate${i%3} 0.4s ease-in-out infinite alternate`
-                : state === 'liquid'
-                ? `floatM${i%4} ${1.5 + (i%3)*0.4}s ease-in-out infinite alternate`
-                : `zoomM${i%4} ${0.8 + (i%3)*0.2}s ease-in-out infinite alternate`,
-            }}
+          <circle cx={m.x} cy={m.y} r={r} fill={color} opacity={0.75}
+            style={{ animation: state === 'solid'
+              ? `vibrate${i%3} 0.4s ease-in-out infinite alternate`
+              : state === 'gas'
+              ? `zoomM${i%4} ${(0.6 + i%3*0.15).toFixed(2)}s ease-in-out infinite alternate`
+              : `floatM${i%4} ${(1.2 + i%3*0.3).toFixed(2)}s ease-in-out infinite alternate` }}
           />
           {state === 'solid' && i < molecules.length - 1 && (
-            <line
-              x1={m.x} y1={m.y}
-              x2={molecules[(i+1) % molecules.length].x}
-              y2={molecules[(i+1) % molecules.length].y}
-              stroke={color} strokeWidth="0.5" opacity={0.2}
-            />
+            <line x1={m.x} y1={m.y} x2={molecules[(i+1)%molecules.length].x} y2={molecules[(i+1)%molecules.length].y}
+              stroke={color} strokeWidth="0.7" opacity={0.25} />
           )}
         </g>
       ))}
@@ -82,14 +74,14 @@ function MoleculesSVG({ q }: { q: number }) {
         @keyframes vibrate0{to{transform:translate(2px,1px)}} 
         @keyframes vibrate1{to{transform:translate(-1px,2px)}} 
         @keyframes vibrate2{to{transform:translate(1px,-2px)}}
-        @keyframes floatM0{to{transform:translate(15px,8px)}} 
-        @keyframes floatM1{to{transform:translate(-12px,10px)}}
-        @keyframes floatM2{to{transform:translate(10px,-12px)}} 
-        @keyframes floatM3{to{transform:translate(-8px,-10px)}}
-        @keyframes zoomM0{to{transform:translate(40px,20px)}} 
-        @keyframes zoomM1{to{transform:translate(-35px,25px)}}
-        @keyframes zoomM2{to{transform:translate(30px,-30px)}} 
-        @keyframes zoomM3{to{transform:translate(-40px,-20px)}}
+        @keyframes floatM0{to{transform:translate(14px,7px)}} 
+        @keyframes floatM1{to{transform:translate(-11px,9px)}}
+        @keyframes floatM2{to{transform:translate(9px,-11px)}} 
+        @keyframes floatM3{to{transform:translate(-8px,-9px)}}
+        @keyframes zoomM0{to{transform:translate(38px,18px)}} 
+        @keyframes zoomM1{to{transform:translate(-32px,22px)}}
+        @keyframes zoomM2{to{transform:translate(28px,-28px)}} 
+        @keyframes zoomM3{to{transform:translate(-36px,-18px)}}
       `}</style>
     </svg>
   )
@@ -97,7 +89,7 @@ function MoleculesSVG({ q }: { q: number }) {
 
 function TQGraph({ q: currentQ, lang }: { q: number; lang: 'it' | 'en' }) {
   const W = 500, H = 220
-  const PAD = { l: 45, r: 20, t: 20, b: 35 }
+  const PAD = { l: 48, r: 20, t: 20, b: 38 }
   const gW = W - PAD.l - PAD.r
   const gH = H - PAD.t - PAD.b
 
@@ -105,61 +97,48 @@ function TQGraph({ q: currentQ, lang }: { q: number; lang: 'it' | 'en' }) {
     [0, T0], [Q1, 0], [Q2, 0], [Q3, 100], [QMAX, 100 + (QMAX - Q3)/C_STE],
   ]
 
-  const minT = T0 - 5, maxT = 130
+  const minT = T0 - 5, maxT = 125
   const qx = (q: number) => PAD.l + (q / QMAX) * gW
   const ty = (t: number) => PAD.t + gH - ((t - minT) / (maxT - minT)) * gH
 
-  const pathD = points.map(([q,t],i) => `${i===0?'M':'L'}${qx(q).toFixed(1)},${ty(t).toFixed(1)}`).join(' ')
+  const pathD = points.map(([q,t],i) =>
+    `${i===0?'M':'L'}${qx(q).toFixed(1)},${ty(t).toFixed(1)}`
+  ).join(' ')
 
   const curX = qx(currentQ)
   const curY = ty(tempFromQ(currentQ))
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="sim-svg">
-      <defs>
-        <linearGradient id="tqGrad" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stopColor="#90caf9" />
-          <stop offset={`${Q1/QMAX*100}%`} stopColor="#90caf9" />
-          <stop offset={`${Q2/QMAX*100}%`} stopColor="#4fc3f7" />
-          <stop offset={`${Q3/QMAX*100}%`} stopColor="#ff7043" />
-          <stop offset="100%" stopColor="#ff7043" />
-        </linearGradient>
-      </defs>
-
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: '#f8fafc', borderRadius: 8, border: '1px solid #e0e4ea', display: 'block', width: '100%', margin: '0.75rem 0' }}>
       {/* grid */}
-      {[-40, 0, 20, 100].map(t => (
-        <line key={t} x1={PAD.l} y1={ty(t)} x2={W - PAD.r} y2={ty(t)}
-          stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+      {[-40, 0, 100].map(t => (
+        <line key={t} x1={PAD.l} y1={ty(t)} x2={W-PAD.r} y2={ty(t)}
+          stroke="#e0e4ea" strokeWidth="1" />
       ))}
-
       {/* axes */}
-      <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H - PAD.b} stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
-      <line x1={PAD.l} y1={H - PAD.b} x2={W - PAD.r} y2={H - PAD.b} stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
-
+      <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H-PAD.b+5} stroke="#9aadcc" strokeWidth="1.5" />
+      <line x1={PAD.l-5} y1={H-PAD.b} x2={W-PAD.r} y2={H-PAD.b} stroke="#9aadcc" strokeWidth="1.5" />
       {/* axis labels */}
-      <text x={PAD.l - 6} y={ty(0) + 4} textAnchor="end" fill="var(--muted)" fontSize="9">0°</text>
-      <text x={PAD.l - 6} y={ty(100) + 4} textAnchor="end" fill="var(--muted)" fontSize="9">100°</text>
-      <text x={PAD.l - 6} y={ty(T0) + 4} textAnchor="end" fill="var(--muted)" fontSize="9">{T0}°</text>
-      <text x={PAD.l + gW/2} y={H - 5} textAnchor="middle" fill="var(--muted)" fontSize="9">
+      <text x={PAD.l-6} y={ty(0)+4} textAnchor="end" fill="#6b7280" fontSize="9">0°</text>
+      <text x={PAD.l-6} y={ty(100)+4} textAnchor="end" fill="#6b7280" fontSize="9">100°</text>
+      <text x={PAD.l-6} y={ty(T0)+4} textAnchor="end" fill="#6b7280" fontSize="9">{T0}°</text>
+      <text x={PAD.l + gW/2} y={H-5} textAnchor="middle" fill="#6b7280" fontSize="9">
         {lang==='it'?'Calore aggiunto (kJ)':'Heat added (kJ)'}
       </text>
-      <text x={8} y={PAD.t + gH/2} textAnchor="middle" fill="var(--muted)" fontSize="9"
-        transform={`rotate(-90,8,${PAD.t + gH/2})`}>T (°C)</text>
-
+      <text x={10} y={PAD.t + gH/2} textAnchor="middle" fill="#6b7280" fontSize="9"
+        transform={`rotate(-90,10,${PAD.t + gH/2})`}>T (°C)</text>
       {/* plateau labels */}
-      <text x={qx((Q1+Q2)/2)} y={ty(0) - 6} textAnchor="middle" fill="#fff176" fontSize="8">
+      <text x={qx((Q1+Q2)/2)} y={ty(0)-6} textAnchor="middle" fill="#f57c00" fontSize="8" fontWeight="600">
         {lang==='it'?'Fusione':'Melting'}
       </text>
-      <text x={qx(Q3 + 30)} y={ty(100) - 6} textAnchor="middle" fill="#ff7043" fontSize="8">
+      <text x={qx(Q3+30)} y={ty(100)-6} textAnchor="middle" fill="#c62828" fontSize="8" fontWeight="600">
         {lang==='it'?'Ebollizione':'Boiling'}
       </text>
-
       {/* curve */}
-      <path d={pathD} fill="none" stroke="url(#tqGrad)" strokeWidth="2.5" strokeLinejoin="round" />
-
+      <path d={pathD} fill="none" stroke="#1565c0" strokeWidth="2.5" strokeLinejoin="round" />
       {/* current point */}
-      <line x1={curX} y1={PAD.t} x2={curX} y2={H - PAD.b} stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="3,3" />
-      <circle cx={curX} cy={curY} r={5} fill="white" stroke="var(--primary)" strokeWidth="2" />
+      <line x1={curX} y1={PAD.t} x2={curX} y2={H-PAD.b} stroke="rgba(0,0,0,0.15)" strokeWidth="1" strokeDasharray="3,3" />
+      <circle cx={curX} cy={curY} r={5} fill="white" stroke="#1565c0" strokeWidth="2" />
     </svg>
   )
 }
@@ -214,9 +193,9 @@ export default function PassaggiStato() {
 
         <div style={{
           display: 'flex', alignItems: 'center', gap: '1rem',
-          background: 'rgba(255,255,255,0.04)', borderRadius: 10,
+          background: 'var(--bg)', borderRadius: 8,
           padding: '0.75rem 1rem', marginBottom: '0.75rem',
-          border: `1px solid ${stato.color}40`,
+          border: `1.5px solid ${stato.color}40`,
         }}>
           <span style={{ fontSize: '2rem' }}>{stato.icon}</span>
           <div>

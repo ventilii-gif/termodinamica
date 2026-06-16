@@ -10,7 +10,7 @@ function GasBoxSVG({ n, T, V }: { n: number; T: number; V: number }) {
   const speed = Math.sqrt(T / 300)
   const numMol = Math.round(n * 6 + 4)
   const density = n / V
-  const boxSize = Math.max(60, Math.min(W - 40, 100 / Math.cbrt(density * 0.5)))
+  const boxSize = Math.max(70, Math.min(W - 40, 110 / Math.cbrt(density * 0.5)))
   const bx = (W - boxSize) / 2, by = (H - boxSize) / 2
 
   const molecules = useMemo(() => {
@@ -21,27 +21,23 @@ function GasBoxSVG({ n, T, V }: { n: number; T: number; V: number }) {
         y: by + 8 + ((seed * 7.3) % (boxSize - 16)),
         delay: (i * 0.15) % 1.5,
         dur: (0.4 + (i % 5) * 0.12) / speed,
-        dx: (i % 2 === 0 ? 1 : -1) * (8 + (i % 4) * 3),
-        dy: (i % 3 === 0 ? 1 : -1) * (6 + (i % 4) * 2),
+        dx: (i % 2 === 0 ? 1 : -1) * (7 + (i % 4) * 3),
+        dy: (i % 3 === 0 ? 1 : -1) * (5 + (i % 4) * 2),
       }
     })
   }, [numMol, boxSize, bx, by, speed])
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="sim-svg" style={{ maxHeight: 200 }}>
-      <rect x={0} y={0} width={W} height={H} fill="rgba(0,0,0,0.35)" rx={8} />
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: '#f8fafc', borderRadius: 8, border: '1px solid #e0e4ea', display: 'block', width: '100%', maxHeight: 200, margin: '0.75rem 0' }}>
       <rect x={bx} y={by} width={boxSize} height={boxSize} rx={4}
-        fill="rgba(255,112,67,0.04)" stroke="rgba(255,112,67,0.4)" strokeWidth="1.5" />
-      {/* volume label */}
-      <text x={bx + boxSize/2} y={by - 6} textAnchor="middle" fill="var(--muted)" fontSize="9">
+        fill="#e8f0fe" stroke="#1565c0" strokeWidth="1.5" />
+      <text x={bx + boxSize/2} y={by - 6} textAnchor="middle" fill="#6b7280" fontSize="9">
         V = {V.toFixed(1)} L
       </text>
       {molecules.map((m, i) => (
-        <circle key={i} cx={m.x} cy={m.y} r={4}
-          fill="var(--primary)" opacity={0.8}
-          style={{
-            animation: `mol${i%6} ${m.dur.toFixed(2)}s ${m.delay.toFixed(2)}s ease-in-out infinite alternate`,
-          }}
+        <circle key={i} cx={m.x} cy={m.y} r={5}
+          fill="#1565c0" opacity={0.75}
+          style={{ animation: `mol${i%6} ${m.dur.toFixed(2)}s ${m.delay.toFixed(2)}s ease-in-out infinite alternate` }}
         />
       ))}
       <style>{molecules.map((m, i) =>
@@ -70,10 +66,9 @@ export default function GasPerfetti() {
         <p>{t.sec1Text}</p>
         <div className="info-box tip">
           <span className="info-box-icon">💡</span>
-          <span>
-            {lang==='it'
-              ? 'Gas reali si comportano come gas perfetti a bassa pressione (< 10 atm) e alta temperatura. L’aria a condizioni normali è un buon esempio.'
-              : 'Real gases behave like ideal gases at low pressure (< 10 atm) and high temperature. Air under normal conditions is a good example.'}
+          <span>{lang==='it'
+            ? "Gas reali si comportano come gas perfetti a bassa pressione (< 10 atm) e alta temperatura. L'aria a condizioni normali è un buon esempio."
+            : 'Real gases behave like ideal gases at low pressure (< 10 atm) and high temperature. Air under normal conditions is a good example.'}
           </span>
         </div>
       </div>
@@ -98,10 +93,9 @@ export default function GasPerfetti() {
         </div>
         <div className="info-box physics">
           <span className="info-box-icon">⚗️</span>
-          <span>
-            {lang==='it'
-              ? 'Calcolo: 1 mol, T = 0°C = 273,15 K, P = 101325 Pa. V = nRT/P = 1 × 8,314 × 273,15 / 101325 = 0,02241 m³ = 22,41 L'
-              : 'Calculation: 1 mol, T = 0°C = 273.15 K, P = 101,325 Pa. V = nRT/P = 1 × 8.314 × 273.15 / 101325 = 0.02241 m³ = 22.41 L'}
+          <span>{lang==='it'
+            ? 'Calcolo: 1 mol, T = 0°C = 273,15 K, P = 101325 Pa. V = nRT/P = 1 × 8,314 × 273,15 / 101325 = 0,02241 m³ = 22,41 L'
+            : 'Calculation: 1 mol, T = 0°C = 273.15 K, P = 101,325 Pa. V = nRT/P = 1 × 8.314 × 273.15 / 101325 = 0.02241 m³ = 22.41 L'}
           </span>
         </div>
       </div>
@@ -112,20 +106,17 @@ export default function GasPerfetti() {
 
         <div className="ctrl-row">
           <span className="ctrl-label">{t.readN} (mol)</span>
-          <input type="range" min="0.5" max="5" step="0.5" value={n}
-            onChange={e => setN(+e.target.value)} />
+          <input type="range" min="0.5" max="5" step="0.5" value={n} onChange={e => setN(+e.target.value)} />
           <span className="ctrl-value">{n.toFixed(1)} mol</span>
         </div>
         <div className="ctrl-row">
           <span className="ctrl-label">{t.readT} (K)</span>
-          <input type="range" min="100" max="1000" step="10" value={TK}
-            onChange={e => setTK(+e.target.value)} />
+          <input type="range" min="100" max="1000" step="10" value={TK} onChange={e => setTK(+e.target.value)} />
           <span className="ctrl-value">{TK} K</span>
         </div>
         <div className="ctrl-row">
           <span className="ctrl-label">{t.readV} (L)</span>
-          <input type="range" min="0.5" max="20" step="0.5" value={V}
-            onChange={e => setV(+e.target.value)} />
+          <input type="range" min="0.5" max="20" step="0.5" value={V} onChange={e => setV(+e.target.value)} />
           <span className="ctrl-value">{V.toFixed(1)} L</span>
         </div>
 
@@ -137,7 +128,7 @@ export default function GasPerfetti() {
             <span className="readout-value">{P_atm.toFixed(3)} atm</span>
           </div>
           <div className="readout">
-            <span className="readout-label">{t.readP} (Pa)</span>
+            <span className="readout-label">{t.readP} (kPa)</span>
             <span className="readout-value">{(P_Pa/1000).toFixed(1)} kPa</span>
           </div>
           <div className="readout">
@@ -153,13 +144,12 @@ export default function GasPerfetti() {
             <span className="readout-value">{n.toFixed(1)} mol</span>
           </div>
           <div className="readout">
-            <span className="readout-label">P·V</span>
+            <span className="readout-label">P·V (J)</span>
             <span className="readout-value">{(P_Pa * V * 1e-3).toFixed(1)} J</span>
           </div>
         </div>
-
         <p style={{ fontSize: '0.82rem', color: 'var(--primary)', marginTop: '0.75rem', fontFamily: 'JetBrains Mono, monospace' }}>
-          PV = nRT: {(P_Pa * V * 1e-3).toFixed(1)} J = {n.toFixed(1)} × 8,314 × {TK} = {(n * R * TK).toFixed(1)} J ✓
+          PV = nRT: {(P_Pa * V * 1e-3).toFixed(1)} = {n.toFixed(1)} × 8,314 × {TK} = {(n * R * TK).toFixed(1)} J ✓
         </p>
       </div>
 
