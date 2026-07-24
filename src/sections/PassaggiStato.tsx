@@ -10,12 +10,11 @@ const L_VAP = 2260
 const C_STE = 2.01
 const T0 = -40
 
-// Cumulative heat thresholds for 1 kg of water
-const Q1 = C_ICE * (0 - T0)           // 83.6  kJ — fine riscaldamento ghiaccio
-const Q2 = Q1 + L_FUS                  // 417.6 kJ — fine fusione
-const Q3 = Q2 + C_WAT * 100            // 836.2 kJ — fine riscaldamento acqua
-const Q4 = Q3 + L_VAP                  // 3096  kJ — fine vaporizzazione
-const QMAX = Q4 + C_STE * 40          // 3176  kJ — fine (vapore a ~120°C)
+const Q1 = C_ICE * (0 - T0)
+const Q2 = Q1 + L_FUS
+const Q3 = Q2 + C_WAT * 100
+const Q4 = Q3 + L_VAP
+const QMAX = Q4 + C_STE * 40
 
 function tempFromQ(q: number): number {
   if (q <= 0) return T0
@@ -27,7 +26,7 @@ function tempFromQ(q: number): number {
 }
 
 function stateFromQ(q: number, lang: 'it' | 'en'): { label: string; icon: string; color: string } {
-  if (q < Q1) return { label: lang==='it'?'Ghiaccio (solido)':'Ice (solid)', icon: '🧧', color: '#1565c0' }
+  if (q < Q1) return { label: lang==='it'?'Ghiaccio (solido)':'Ice (solid)', icon: '🧊', color: '#1565c0' }
   if (q < Q2) return { label: lang==='it'?'Fusione in corso...':'Melting...', icon: '🌊', color: '#f57c00' }
   if (q < Q3) return { label: lang==='it'?'Acqua (liquido)':'Water (liquid)', icon: '💧', color: '#0277bd' }
   if (q < Q4) return { label: lang==='it'?'Ebollizione in corso...':'Boiling...', icon: '♨️', color: '#c62828' }
@@ -58,7 +57,7 @@ function MoleculesSVG({ q }: { q: number }) {
   const r = state === 'gas' ? 7 : 6
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: '#f8fafc', borderRadius: 8, border: '1px solid #e0e4ea', display: 'block', width: '100%', margin: '0.5rem 0' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: 'var(--bg)', borderRadius: 8, border: '1px solid var(--border)', display: 'block', width: '100%', margin: '0.5rem 0' }}>
       {molecules.map((m, i) => (
         <g key={i}>
           <circle cx={m.x} cy={m.y} r={r} fill={color} opacity={0.75}
@@ -97,14 +96,13 @@ function TQGraph({ q: currentQ, lang }: { q: number; lang: 'it' | 'en' }) {
   const gW = W - PAD.l - PAD.r
   const gH = H - PAD.t - PAD.b
 
-  // 6 punti che definiscono la curva con i due plateau
   const points: [number, number][] = [
-    [0,    T0],  // ghiaccio freddo
-    [Q1,   0],   // inizio fusione
-    [Q2,   0],   // fine fusione    — plateau 1 a 0°C
-    [Q3,   100], // inizio ebollizione
-    [Q4,   100], // fine ebollizione — plateau 2 a 100°C
-    [QMAX, 100 + (QMAX - Q4) / C_STE],  // vapore surriscaldato
+    [0,    T0],
+    [Q1,   0],
+    [Q2,   0],
+    [Q3,   100],
+    [Q4,   100],
+    [QMAX, 100 + (QMAX - Q4) / C_STE],
   ]
 
   const minT = T0 - 5, maxT = 130
@@ -119,24 +117,24 @@ function TQGraph({ q: currentQ, lang }: { q: number; lang: 'it' | 'en' }) {
   const curY = ty(tempFromQ(currentQ))
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: '#f8fafc', borderRadius: 8, border: '1px solid #e0e4ea', display: 'block', width: '100%', margin: '0.75rem 0' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: 'var(--bg)', borderRadius: 8, border: '1px solid var(--border)', display: 'block', width: '100%', margin: '0.75rem 0' }}>
       {/* grid */}
       {[-40, 0, 100].map(t => (
         <line key={t} x1={PAD.l} y1={ty(t)} x2={W - PAD.r} y2={ty(t)}
-          stroke="#e0e4ea" strokeWidth="1" />
+          stroke="var(--border)" strokeWidth="1" />
       ))}
       {/* axes */}
-      <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H - PAD.b + 5} stroke="#9aadcc" strokeWidth="1.5" />
-      <line x1={PAD.l - 5} y1={H - PAD.b} x2={W - PAD.r} y2={H - PAD.b} stroke="#9aadcc" strokeWidth="1.5" />
+      <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H - PAD.b + 5} stroke="var(--border-bright)" strokeWidth="1.5" />
+      <line x1={PAD.l - 5} y1={H - PAD.b} x2={W - PAD.r} y2={H - PAD.b} stroke="var(--border-bright)" strokeWidth="1.5" />
       {/* T axis labels */}
-      <text x={PAD.l - 6} y={ty(0) + 4} textAnchor="end" fill="#6b7280" fontSize="9">0°</text>
-      <text x={PAD.l - 6} y={ty(100) + 4} textAnchor="end" fill="#6b7280" fontSize="9">100°</text>
-      <text x={PAD.l - 6} y={ty(T0) + 4} textAnchor="end" fill="#6b7280" fontSize="9">{T0}°</text>
+      <text x={PAD.l - 6} y={ty(0) + 4} textAnchor="end" fill="var(--muted)" fontSize="9">0°</text>
+      <text x={PAD.l - 6} y={ty(100) + 4} textAnchor="end" fill="var(--muted)" fontSize="9">100°</text>
+      <text x={PAD.l - 6} y={ty(T0) + 4} textAnchor="end" fill="var(--muted)" fontSize="9">{T0}°</text>
       {/* axis names */}
-      <text x={PAD.l + gW / 2} y={H - 5} textAnchor="middle" fill="#6b7280" fontSize="9">
+      <text x={PAD.l + gW / 2} y={H - 5} textAnchor="middle" fill="var(--muted)" fontSize="9">
         {lang === 'it' ? 'Calore aggiunto (kJ)' : 'Heat added (kJ)'}
       </text>
-      <text x={10} y={PAD.t + gH / 2} textAnchor="middle" fill="#6b7280" fontSize="9"
+      <text x={10} y={PAD.t + gH / 2} textAnchor="middle" fill="var(--muted)" fontSize="9"
         transform={`rotate(-90,10,${PAD.t + gH / 2})`}>T (°C)</text>
       {/* plateau labels */}
       <text x={qx((Q1 + Q2) / 2)} y={ty(0) - 7} textAnchor="middle" fill="#f57c00" fontSize="8" fontWeight="600">
@@ -146,15 +144,15 @@ function TQGraph({ q: currentQ, lang }: { q: number; lang: 'it' | 'en' }) {
         {lang === 'it' ? 'Ebollizione (2260 kJ/kg)' : 'Boiling (2260 kJ/kg)'}
       </text>
       {/* curve */}
-      <path d={pathD} fill="none" stroke="#1565c0" strokeWidth="2.5" strokeLinejoin="round" />
+      <path d={pathD} fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinejoin="round" />
       {/* current position */}
       <line x1={curX} y1={PAD.t} x2={curX} y2={H - PAD.b}
-        stroke="rgba(0,0,0,0.15)" strokeWidth="1" strokeDasharray="3,3" />
-      <circle cx={curX} cy={curY} r={5} fill="white" stroke="#1565c0" strokeWidth="2" />
+        stroke="var(--muted)" strokeWidth="1" strokeDasharray="3,3" opacity="0.5" />
+      <circle cx={curX} cy={curY} r={5} fill="var(--surface)" stroke="var(--primary)" strokeWidth="2" />
       {/* Q scale ticks */}
       {[Q1, Q2, Q3, Q4].map((q, i) => (
         <line key={i} x1={qx(q)} y1={H - PAD.b} x2={qx(q)} y2={H - PAD.b + 5}
-          stroke="#9aadcc" strokeWidth="1" />
+          stroke="var(--border-bright)" strokeWidth="1" />
       ))}
     </svg>
   )

@@ -22,6 +22,29 @@
   --radius: 12px;
 }
 
+[data-theme="dark"] {
+  --bg: #0f1117;
+  --surface: #161a24;
+  --surface-hover: #1e2335;
+  --border: #252b3d;
+  --border-bright: #3d5a9e;
+  --primary: #5b8cdd;
+  --primary-d: #4a7fd4;
+  --primary-light: #1a2a4a;
+  --accent: #ff7043;
+  --accent2: #ffa040;
+  --green: #66bb6a;
+  --green-bg: #0d1f0d;
+  --red: #ef5350;
+  --red-bg: #1f0d0d;
+  --text: #e0e4f0;
+  --muted: #7a8499;
+  --formula-bg: #1a2240;
+  --formula-border: #2d4080;
+  --shadow: 0 1px 4px rgba(0,0,0,0.50), 0 0 0 1px rgba(0,0,0,0.30);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.60);
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
@@ -40,7 +63,7 @@ html, body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #fff;
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 0 1.5rem;
   display: flex;
@@ -63,6 +86,13 @@ html, body {
 
 .header-brand span { color: var(--accent); }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 .lang-toggle {
   display: flex;
   gap: 4px;
@@ -70,7 +100,6 @@ html, body {
   border-radius: 20px;
   padding: 3px;
   border: 1px solid var(--border);
-  flex-shrink: 0;
 }
 
 .lang-btn {
@@ -91,9 +120,29 @@ html, body {
   color: #fff;
 }
 
+.theme-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 34px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition: background 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-btn:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
 /* Nav */
 .nav {
-  background: #fff;
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 0.55rem 1rem;
   display: flex;
@@ -110,7 +159,7 @@ html, body {
 
 .nav-btn {
   flex: 0 0 auto;
-  background: #fff;
+  background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 20px;
   padding: 0.4rem 1rem;
@@ -193,7 +242,7 @@ main {
   margin: 0.6rem 0;
   font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-size: 1rem;
-  color: var(--primary-d);
+  color: var(--primary);
   overflow-x: auto;
   white-space: nowrap;
 }
@@ -205,6 +254,12 @@ main {
   font-size: 1.15rem;
   text-align: center;
   font-weight: 600;
+}
+
+[data-theme="dark"] .formula.highlight {
+  background: #2e1800;
+  border-color: #7a3000;
+  color: #ff8a50;
 }
 
 /* Info boxes */
@@ -224,10 +279,20 @@ main {
   color: var(--green);
 }
 
+[data-theme="dark"] .info-box.tip {
+  border-color: #2d5a2d;
+}
+
 .info-box.warn {
   background: #fff8e1;
   border: 1px solid #ffe082;
   color: #f57f17;
+}
+
+[data-theme="dark"] .info-box.warn {
+  background: #1f1a00;
+  border-color: #5a4a00;
+  color: #ffd54f;
 }
 
 .info-box.example {
@@ -236,10 +301,22 @@ main {
   color: #880e4f;
 }
 
+[data-theme="dark"] .info-box.example {
+  background: #1f0a14;
+  border-color: #5a1a35;
+  color: #f48fb1;
+}
+
 .info-box.physics {
   background: #f3e5f5;
   border: 1px solid #ce93d8;
   color: #6a1b9a;
+}
+
+[data-theme="dark"] .info-box.physics {
+  background: #14091f;
+  border-color: #3d1560;
+  color: #ce93d8;
 }
 
 .info-box-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
@@ -330,7 +407,7 @@ input[type=range] {
   border-radius: 8px;
   margin: 0.75rem 0;
   border: 1px solid var(--border);
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 /* Quiz */
@@ -405,7 +482,7 @@ input[type=range] {
 
 .quiz-explanation {
   font-size: 0.88rem;
-  color: #1a3c6b;
+  color: var(--primary);
   background: var(--formula-bg);
   border: 1px solid var(--formula-border);
   border-radius: 8px;

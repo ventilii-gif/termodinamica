@@ -55,7 +55,7 @@ function PVDiagram({ tipo, P1, V1, P2, V2 }: { tipo: TrasformazioneKey; P1: numb
   const color = colors[tipo]
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: '#f8fafc', borderRadius: 8, border: '1px solid #e0e4ea', display: 'block', width: '100%', margin: '0.75rem 0' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: 'var(--bg)', borderRadius: 8, border: '1px solid var(--border)', display: 'block', width: '100%', margin: '0.75rem 0' }}>
       <defs>
         <marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="3" orient="auto">
           <path d="M0,0 L8,3 L0,6 Z" fill={color} />
@@ -64,22 +64,22 @@ function PVDiagram({ tipo, P1, V1, P2, V2 }: { tipo: TrasformazioneKey; P1: numb
       {/* area */}
       <path d={areaD} fill={color} opacity={0.08} />
       {/* grid */}
-      <line x1={PAD.l} y1={py(P1)} x2={W-PAD.r} y2={py(P1)} stroke="#e0e4ea" strokeWidth="1" />
-      {P2 !== P1 && <line x1={PAD.l} y1={py(P2)} x2={W-PAD.r} y2={py(P2)} stroke="#e0e4ea" strokeWidth="1" />}
+      <line x1={PAD.l} y1={py(P1)} x2={W-PAD.r} y2={py(P1)} stroke="var(--border)" strokeWidth="1" />
+      {P2 !== P1 && <line x1={PAD.l} y1={py(P2)} x2={W-PAD.r} y2={py(P2)} stroke="var(--border)" strokeWidth="1" />}
       {/* axes */}
-      <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H-PAD.b+5} stroke="#9aadcc" strokeWidth="1.5" />
-      <line x1={PAD.l-5} y1={H-PAD.b} x2={W-PAD.r} y2={H-PAD.b} stroke="#9aadcc" strokeWidth="1.5" />
-      <text x={PAD.l-8} y={PAD.t+4} textAnchor="end" fill="#6b7280" fontSize="11" fontWeight="600">P</text>
-      <text x={W-PAD.r} y={H-PAD.b+14} textAnchor="middle" fill="#6b7280" fontSize="11" fontWeight="600">V</text>
+      <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H-PAD.b+5} stroke="var(--border-bright)" strokeWidth="1.5" />
+      <line x1={PAD.l-5} y1={H-PAD.b} x2={W-PAD.r} y2={H-PAD.b} stroke="var(--border-bright)" strokeWidth="1.5" />
+      <text x={PAD.l-8} y={PAD.t+4} textAnchor="end" fill="var(--muted)" fontSize="11" fontWeight="600">P</text>
+      <text x={W-PAD.r} y={H-PAD.b+14} textAnchor="middle" fill="var(--muted)" fontSize="11" fontWeight="600">V</text>
       {/* ticks */}
-      <text x={PAD.l-4} y={py(P1)+4} textAnchor="end" fill="#6b7280" fontSize="8">{P1.toFixed(1)}</text>
-      <text x={PAD.l-4} y={py(P2)+4} textAnchor="end" fill="#6b7280" fontSize="8">{P2.toFixed(1)}</text>
-      <text x={px(V1)} y={H-PAD.b+12} textAnchor="middle" fill="#6b7280" fontSize="8">{V1.toFixed(1)}</text>
-      <text x={px(V2)} y={H-PAD.b+12} textAnchor="middle" fill="#6b7280" fontSize="8">{V2.toFixed(1)}</text>
+      <text x={PAD.l-4} y={py(P1)+4} textAnchor="end" fill="var(--muted)" fontSize="8">{P1.toFixed(1)}</text>
+      <text x={PAD.l-4} y={py(P2)+4} textAnchor="end" fill="var(--muted)" fontSize="8">{P2.toFixed(1)}</text>
+      <text x={px(V1)} y={H-PAD.b+12} textAnchor="middle" fill="var(--muted)" fontSize="8">{V1.toFixed(1)}</text>
+      <text x={px(V2)} y={H-PAD.b+12} textAnchor="middle" fill="var(--muted)" fontSize="8">{V2.toFixed(1)}</text>
       {/* curve */}
       <path d={pathD} fill="none" stroke={color} strokeWidth="2.5" markerMid="url(#arr)" strokeLinejoin="round" />
       {/* points */}
-      <circle cx={px(V1)} cy={py(P1)} r={5} fill="white" stroke={color} strokeWidth="2" />
+      <circle cx={px(V1)} cy={py(P1)} r={5} fill="var(--surface)" stroke={color} strokeWidth="2" />
       <text x={px(V1)+8} y={py(P1)-6} fill={color} fontSize="9" fontWeight="600">A</text>
       <circle cx={px(V2)} cy={py(P2)} r={5} fill={color} stroke={color} strokeWidth="2" />
       <text x={px(V2)+8} y={py(P2)-6} fill={color} fontSize="9" fontWeight="600">B</text>

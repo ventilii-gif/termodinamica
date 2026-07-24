@@ -28,15 +28,15 @@ function GasBoxSVG({ n, T, V }: { n: number; T: number; V: number }) {
   }, [numMol, boxSize, bx, by, speed])
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: '#f8fafc', borderRadius: 8, border: '1px solid #e0e4ea', display: 'block', width: '100%', maxHeight: 200, margin: '0.75rem 0' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ background: 'var(--bg)', borderRadius: 8, border: '1px solid var(--border)', display: 'block', width: '100%', maxHeight: 200, margin: '0.75rem 0' }}>
       <rect x={bx} y={by} width={boxSize} height={boxSize} rx={4}
-        fill="#e8f0fe" stroke="#1565c0" strokeWidth="1.5" />
-      <text x={bx + boxSize/2} y={by - 6} textAnchor="middle" fill="#6b7280" fontSize="9">
+        fill="var(--formula-bg)" stroke="var(--primary)" strokeWidth="1.5" />
+      <text x={bx + boxSize/2} y={by - 6} textAnchor="middle" fill="var(--muted)" fontSize="9">
         V = {V.toFixed(1)} L
       </text>
       {molecules.map((m, i) => (
         <circle key={i} cx={m.x} cy={m.y} r={5}
-          fill="#1565c0" opacity={0.75}
+          fill="var(--primary)" opacity={0.75}
           style={{ animation: `mol${i%6} ${m.dur.toFixed(2)}s ${m.delay.toFixed(2)}s ease-in-out infinite alternate` }}
         />
       ))}

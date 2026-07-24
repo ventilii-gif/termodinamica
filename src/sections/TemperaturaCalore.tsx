@@ -27,12 +27,12 @@ function ThermometerSVG({ celsius }: { celsius: number }) {
   const ticks: [number, string][] = [[-100,''], [0,'0°'], [100,'100°'], [200,'200°'], [300,'300°'], [400,'400°'], [500,'']]
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ maxWidth: 160, margin: '0 auto', display: 'block', background: '#f8fafc', borderRadius: 10, border: '1px solid #e0e4ea' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ maxWidth: 160, margin: '0 auto', display: 'block', background: 'var(--bg)', borderRadius: 10, border: '1px solid var(--border)' }}>
       {/* bulb */}
       <circle cx={tubeX + tubeW/2} cy={tubeBottom + 20} r={18} fill={color} stroke="rgba(0,0,0,0.15)" strokeWidth="1.5" />
       {/* tube outline */}
       <rect x={tubeX} y={tubeTop} width={tubeW} height={tubeH + 2} rx={tubeW/2}
-        fill="#e8edf5" stroke="#b0c0d8" strokeWidth="1.5" />
+        fill="var(--formula-bg)" stroke="var(--border-bright)" strokeWidth="1.5" />
       {/* mercury fill */}
       {fillH > 0 && (
         <rect x={tubeX + 2} y={fillY} width={tubeW - 4} height={fillH}
@@ -44,8 +44,8 @@ function ThermometerSVG({ celsius }: { celsius: number }) {
         return (
           <g key={c}>
             <line x1={tubeX + tubeW} y1={y} x2={tubeX + tubeW + 8} y2={y}
-              stroke="#9aadcc" strokeWidth="1" />
-            {label && <text x={tubeX + tubeW + 12} y={y + 4} fill="#6b7280" fontSize="9">{label}</text>}
+              stroke="var(--border-bright)" strokeWidth="1" />
+            {label && <text x={tubeX + tubeW + 12} y={y + 4} fill="var(--muted)" fontSize="9">{label}</text>}
           </g>
         )
       })}
@@ -151,7 +151,7 @@ export default function TemperaturaCalore() {
                   onClick={() => setCelsius(Math.round(c))}
                   style={{
                     display: 'block', width: '100%', textAlign: 'left',
-                    background: Math.abs(celsius - c) < 1 ? 'var(--primary-light)' : '#fff',
+                    background: Math.abs(celsius - c) < 1 ? 'var(--primary-light)' : 'var(--surface)',
                     border: '1.5px solid ' + (Math.abs(celsius - c) < 1 ? 'var(--primary)' : 'var(--border)'),
                     borderRadius: 6, padding: '0.32rem 0.7rem', marginBottom: '0.3rem',
                     cursor: 'pointer', fontSize: '0.82rem', color: 'var(--text)', fontFamily: 'inherit',
