@@ -20,7 +20,7 @@ const it = {
       { icon: '⚙️', title: 'Termodinamica', sub: 'ΔU = Q − L e le trasformazioni' },
     ],
     howItWorks: '🚀 Come funziona questa app',
-    howItWorksDesc: 'Ogni sezione ha tre parti: teoria con formule ed esempi, una simulazione interattiva con cursori e grafici, e un quiz finale con 8 domande per testare la comprensione.',
+    howItWorksDesc: 'Ogni argomento è diviso in quattro sotto-schede: Teoria con formule ed esempi, una Simulazione interattiva con cursori e grafici, Esercizi graduati e guidati (facile, medio, difficile, anche con formule inverse) e un Quiz da 10 domande con soluzione immediata e commentata. Alla fine trovi la scheda Test Finale con 20 quesiti riepilogativi e correzione solo al termine.',
     tip: 'Consiglio: inizia dalla simulazione — muovi i cursori e osserva cosa cambia. La teoria diventerà intuitiva.',
     facts: '✨ Fatti che ti stupiranno',
     factsList: [
@@ -183,7 +183,7 @@ const en: typeof it = {
       { icon: '⚙️', title: 'Thermodynamics', sub: 'ΔU = Q − W and transformations' },
     ],
     howItWorks: '🚀 How this app works',
-    howItWorksDesc: 'Each section has three parts: theory with formulas and examples, an interactive simulation with sliders and graphs, and an 8-question quiz to test your understanding.',
+    howItWorksDesc: 'Each topic is split into four sub-tabs: Theory with formulas and examples, an interactive Simulation with sliders and graphs, graded Guided Exercises (easy, medium, hard, including inverse formulas), and a 10-question Quiz with instant, encouraging feedback. At the end, the Final Test tab has 20 review questions graded only when you finish.',
     tip: 'Tip: start with the simulation — move the sliders and observe what changes. Theory will become intuitive.',
     facts: '✨ Facts that will amaze you',
     factsList: [
