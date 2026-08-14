@@ -1,4 +1,5 @@
 import { i18n } from '../i18n'
+import { uiText } from '../uiText'
 import { useLang } from '../App'
 
 const sectionKeys = ['temperatura', 'passaggi', 'gas', 'termo'] as const
@@ -8,6 +9,7 @@ interface Props { onNavigate: (s: string) => void }
 export default function Home({ onNavigate }: Props) {
   const { lang } = useLang()
   const t = i18n[lang].home
+  const u = uiText[lang]
 
   return (
     <>
@@ -65,6 +67,13 @@ export default function Home({ onNavigate }: Props) {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="card card-accent">
+        <h2>{u.storicaTitle}</h2>
+        {u.storicaText.map((par, i) => (
+          <p key={i}>{par}</p>
+        ))}
       </div>
     </>
   )

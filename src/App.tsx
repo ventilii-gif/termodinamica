@@ -1,12 +1,15 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { i18n, type Lang } from './i18n'
+import { uiText } from './uiText'
 import Home from './sections/Home'
 import TemperaturaCalore from './sections/TemperaturaCalore'
 import PassaggiStato from './sections/PassaggiStato'
 import GasPerfetti from './sections/GasPerfetti'
 import Termodinamica from './sections/Termodinamica'
+import FinalTest from './components/FinalTest'
 
-type Section = 'home' | 'temperatura' | 'passaggi' | 'gas' | 'termo'
+type Section = 'home' | 'temperatura' | 'passaggi' | 'gas' | 'termo' | 'test'
+type SubKey = 'teoria' | 'sim' | 'esercizi' | 'quiz'
 type Theme = 'light' | 'dark'
 
 interface LangCtx { lang: Lang; setLang: (l: Lang) => void }
@@ -17,9 +20,12 @@ export const ThemeContext = createContext<ThemeCtx>({ theme: 'light', toggle: ()
 export const useLang = () => useContext(LangContext)
 export const useTheme = () => useContext(ThemeContext)
 
+const CONTENT: Section[] = ['temperatura', 'passaggi', 'gas', 'termo']
+
 export default function App() {
   const [lang, setLang] = useState<Lang>('it')
   const [section, setSection] = useState<Section>('home')
+  const [sub, setSub] = useState<SubKey>('teoria')
   const [theme, setTheme] = useState<Theme>(() => {
     try {
       const saved = localStorage.getItem('thermo-theme') as Theme | null
@@ -35,6 +41,12 @@ export default function App() {
 
   const toggle = () => setTheme(t => t === 'dark' ? 'light' : 'dark')
   const t = i18n[lang]
+  const u = uiText[lang]
+
+  function goTo(s: Section) {
+    setSection(s)
+    setSub('teoria')
+  }
 
   const navItems: { key: Section; label: string }[] = [
     { key: 'home',        label: t.nav.home },
@@ -42,7 +54,17 @@ export default function App() {
     { key: 'passaggi',   label: t.nav.passaggi },
     { key: 'gas',        label: t.nav.gas },
     { key: 'termo',      label: t.nav.termo },
+    { key: 'test',       label: u.navTest },
   ]
+
+  const subItems: { key: SubKey; label: string }[] = [
+    { key: 'teoria',   label: u.sub.teoria },
+    { key: 'sim',      label: u.sub.sim },
+    { key: 'esercizi', label: u.sub.esercizi },
+    { key: 'quiz',     label: u.sub.quiz },
+  ]
+
+  const showSub = CONTENT.includes(section)
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>
@@ -62,15 +84,23 @@ export default function App() {
         </header>
         <nav className="nav">
           {navItems.map(({key,label}) => (
-            <button key={key} className={`nav-btn${section===key?' active':''}`} onClick={()=>setSection(key)}>{label}</button>
+            <button key={key} className={`nav-btn${section===key?' active':''}`} onClick={()=>goTo(key)}>{label}</button>
           ))}
         </nav>
-        <main key={`${section}-${lang}`} className="section-enter">
-          {section==='home'        && <Home onNavigate={(s)=>setSection(s as Section)} />}
-          {section==='temperatura' && <TemperaturaCalore />}
-          {section==='passaggi'   && <PassaggiStato />}
-          {section==='gas'        && <GasPerfetti />}
-          {section==='termo'      && <Termodinamica />}
+        {showSub && (
+          <div className="seg-control" style={{ maxWidth: 860, margin: '0.75rem auto 0', padding: '4px 6px' }}>
+            {subItems.map(({key,label}) => (
+              <button key={key} className={`seg-btn${sub===key?' active':''}`} onClick={()=>setSub(key)}>{label}</button>
+            ))}
+          </div>
+        )}
+        <main key={`${section}-${sub}-${lang}`} className="section-enter">
+          {section==='home'        && <Home onNavigate={(s)=>goTo(s as Section)} />}
+          {section==='temperatura' && <TemperaturaCalore sub={sub} />}
+          {section==='passaggi'   && <PassaggiStato sub={sub} />}
+          {section==='gas'        && <GasPerfetti sub={sub} />}
+          {section==='termo'      && <Termodinamica sub={sub} />}
+          {section==='test'       && <FinalTest />}
         </main>
       </ThemeContext.Provider>
     </LangContext.Provider>
