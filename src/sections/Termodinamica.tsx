@@ -2,6 +2,10 @@ import { useState, useMemo } from 'react'
 import { i18n } from '../i18n'
 import { useLang } from '../App'
 import Quiz from '../components/Quiz'
+import Exercises from '../components/Exercises'
+import { quizExtra } from '../data/quizExtra'
+
+type SubKey = 'teoria' | 'sim' | 'esercizi' | 'quiz'
 
 const R = 8.314
 const n = 1
@@ -61,24 +65,18 @@ function PVDiagram({ tipo, P1, V1, P2, V2 }: { tipo: TrasformazioneKey; P1: numb
           <path d="M0,0 L8,3 L0,6 Z" fill={color} />
         </marker>
       </defs>
-      {/* area */}
       <path d={areaD} fill={color} opacity={0.08} />
-      {/* grid */}
       <line x1={PAD.l} y1={py(P1)} x2={W-PAD.r} y2={py(P1)} stroke="var(--border)" strokeWidth="1" />
       {P2 !== P1 && <line x1={PAD.l} y1={py(P2)} x2={W-PAD.r} y2={py(P2)} stroke="var(--border)" strokeWidth="1" />}
-      {/* axes */}
       <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H-PAD.b+5} stroke="var(--border-bright)" strokeWidth="1.5" />
       <line x1={PAD.l-5} y1={H-PAD.b} x2={W-PAD.r} y2={H-PAD.b} stroke="var(--border-bright)" strokeWidth="1.5" />
       <text x={PAD.l-8} y={PAD.t+4} textAnchor="end" fill="var(--muted)" fontSize="11" fontWeight="600">P</text>
       <text x={W-PAD.r} y={H-PAD.b+14} textAnchor="middle" fill="var(--muted)" fontSize="11" fontWeight="600">V</text>
-      {/* ticks */}
       <text x={PAD.l-4} y={py(P1)+4} textAnchor="end" fill="var(--muted)" fontSize="8">{P1.toFixed(1)}</text>
       <text x={PAD.l-4} y={py(P2)+4} textAnchor="end" fill="var(--muted)" fontSize="8">{P2.toFixed(1)}</text>
       <text x={px(V1)} y={H-PAD.b+12} textAnchor="middle" fill="var(--muted)" fontSize="8">{V1.toFixed(1)}</text>
       <text x={px(V2)} y={H-PAD.b+12} textAnchor="middle" fill="var(--muted)" fontSize="8">{V2.toFixed(1)}</text>
-      {/* curve */}
       <path d={pathD} fill="none" stroke={color} strokeWidth="2.5" markerMid="url(#arr)" strokeLinejoin="round" />
-      {/* points */}
       <circle cx={px(V1)} cy={py(P1)} r={5} fill="var(--surface)" stroke={color} strokeWidth="2" />
       <text x={px(V1)+8} y={py(P1)-6} fill={color} fontSize="9" fontWeight="600">A</text>
       <circle cx={px(V2)} cy={py(P2)} r={5} fill={color} stroke={color} strokeWidth="2" />
@@ -100,7 +98,7 @@ function calcola(tipo: TrasformazioneKey, P1_atm: number, V1_L: number, P2_atm: 
   const L = P1*(V2-V1); return { Q: dU+L, L, dU, formula: 'L = PΔV' }
 }
 
-export default function Termodinamica() {
+export default function Termodinamica({ sub }: { sub?: SubKey }) {
   const { lang } = useLang()
   const t = i18n[lang].termodinamica
   const [tipo, setTipo] = useState<TrasformazioneKey>('iso')
@@ -108,6 +106,7 @@ export default function Termodinamica() {
   const [V1, setV1] = useState(2)
   const [V2, setV2] = useState(6)
   const [P2, setP2] = useState(1)
+  const show = (s: SubKey) => !sub || sub === s
 
   const derivedP2 = useMemo(() => {
     if (tipo === 'iso') return P1 * V1 / V2
@@ -124,48 +123,52 @@ export default function Termodinamica() {
 
   const fmtJ = (v: number) => `${v >= 0 ? '+' : ''}${(v/1000).toFixed(2)} kJ`
   const sign = (v: number) => v > 50 ? '⬆️' : v < -50 ? '⬇️' : '↔️'
+  const quizQs = [...t.quiz.questions, ...quizExtra[lang].termo]
 
   return (
     <>
-      <div className="card">
-        <h2>{t.title}</h2>
-        <h3>{t.sec1Title}</h3>
-        <p>{t.sec1Text}</p>
-        <div className="formula highlight" style={{ fontSize: '1.4rem' }}>{t.sec1Formula}</div>
-        <div className="info-box warn">
-          <span className="info-box-icon">⚠️</span>
-          <span>{t.sec1Tip}</span>
+      {show('teoria') && <>
+        <div className="card">
+          <h2>{t.title}</h2>
+          <h3>{t.sec1Title}</h3>
+          <p>{t.sec1Text}</p>
+          <div className="formula highlight" style={{ fontSize: '1.4rem' }}>{t.sec1Formula}</div>
+          <div className="info-box warn">
+            <span className="info-box-icon">⚠️</span>
+            <span>{t.sec1Tip}</span>
+          </div>
         </div>
-      </div>
 
-      <div className="card">
-        <h2>{t.sec2Title}</h2>
-        <p>{t.sec2Text}</p>
-        <div className="transform-grid">
-          {t.transforms.map((tr) => (
-            <div key={tr.name} className="transform-card" style={{ borderLeftColor: tr.color, borderLeftWidth: 3 }}>
-              <h4 style={{ color: tr.color }}>{tr.icon} {tr.name}</h4>
-              <div className="transform-row">
-                <span className="transform-key">{lang==='it'?'Condizione':'Condition'}</span>
-                <span className="transform-val" style={{ color: tr.color }}>{tr.cond}</span>
+        <div className="card">
+          <h2>{t.sec2Title}</h2>
+          <p>{t.sec2Text}</p>
+          <div className="transform-grid">
+            {t.transforms.map((tr) => (
+              <div key={tr.name} className="transform-card" style={{ borderLeftColor: tr.color, borderLeftWidth: 3 }}>
+                <h4 style={{ color: tr.color }}>{tr.icon} {tr.name}</h4>
+                <div className="transform-row">
+                  <span className="transform-key">{lang==='it'?'Condizione':'Condition'}</span>
+                  <span className="transform-val" style={{ color: tr.color }}>{tr.cond}</span>
+                </div>
+                <div className="transform-row">
+                  <span className="transform-key">ΔU</span>
+                  <span className="transform-val">{tr.dU}</span>
+                </div>
+                <div className="transform-row">
+                  <span className="transform-key">Q</span>
+                  <span className="transform-val">{tr.Q}</span>
+                </div>
+                <div className="transform-row">
+                  <span className="transform-key">{lang==='it'?'Lavoro':'Work'}</span>
+                  <span className="transform-val">{tr.L}</span>
+                </div>
               </div>
-              <div className="transform-row">
-                <span className="transform-key">ΔU</span>
-                <span className="transform-val">{tr.dU}</span>
-              </div>
-              <div className="transform-row">
-                <span className="transform-key">Q</span>
-                <span className="transform-val">{tr.Q}</span>
-              </div>
-              <div className="transform-row">
-                <span className="transform-key">{lang==='it'?'Lavoro':'Work'}</span>
-                <span className="transform-val">{tr.L}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      </>}
 
+      {show('sim') && (
       <div className="sim-card">
         <h2>🔬 {t.simTitle}</h2>
         <p style={{ fontSize: '0.88rem', color: 'var(--muted)', marginBottom: '1rem' }}>{t.simDesc}</p>
@@ -230,8 +233,10 @@ export default function Termodinamica() {
           </div>
         </div>
       </div>
+      )}
 
-      <Quiz title={t.quiz.title} questions={t.quiz.questions} />
+      {show('esercizi') && <Exercises section="termo" />}
+      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} />}
     </>
   )
 }

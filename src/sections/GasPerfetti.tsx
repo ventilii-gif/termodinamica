@@ -2,6 +2,10 @@ import { useState, useMemo } from 'react'
 import { i18n } from '../i18n'
 import { useLang } from '../App'
 import Quiz from '../components/Quiz'
+import Exercises from '../components/Exercises'
+import { quizExtra } from '../data/quizExtra'
+
+type SubKey = 'teoria' | 'sim' | 'esercizi' | 'quiz'
 
 const R = 8.314
 
@@ -47,59 +51,64 @@ function GasBoxSVG({ n, T, V }: { n: number; T: number; V: number }) {
   )
 }
 
-export default function GasPerfetti() {
+export default function GasPerfetti({ sub }: { sub?: SubKey }) {
   const { lang } = useLang()
   const t = i18n[lang].gasPerfetti
   const [n, setN] = useState(1)
   const [TK, setTK] = useState(300)
   const [V, setV] = useState(5)
+  const show = (s: SubKey) => !sub || sub === s
 
   const P_Pa = (n * R * TK) / (V * 1e-3)
   const P_atm = P_Pa / 101325
   const TC = TK - 273.15
+  const quizQs = [...t.quiz.questions, ...quizExtra[lang].gas]
 
   return (
     <>
-      <div className="card">
-        <h2>{t.title}</h2>
-        <h3>{t.sec1Title}</h3>
-        <p>{t.sec1Text}</p>
-        <div className="info-box tip">
-          <span className="info-box-icon">💡</span>
-          <span>{lang==='it'
-            ? "Gas reali si comportano come gas perfetti a bassa pressione (< 10 atm) e alta temperatura. L'aria a condizioni normali è un buon esempio."
-            : 'Real gases behave like ideal gases at low pressure (< 10 atm) and high temperature. Air under normal conditions is a good example.'}
-          </span>
+      {show('teoria') && <>
+        <div className="card">
+          <h2>{t.title}</h2>
+          <h3>{t.sec1Title}</h3>
+          <p>{t.sec1Text}</p>
+          <div className="info-box tip">
+            <span className="info-box-icon">💡</span>
+            <span>{lang==='it'
+              ? "Gas reali si comportano come gas perfetti a bassa pressione (< 10 atm) e alta temperatura. L'aria a condizioni normali è un buon esempio."
+              : 'Real gases behave like ideal gases at low pressure (< 10 atm) and high temperature. Air under normal conditions is a good example.'}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div className="card">
-        <h2>{t.sec2Title}</h2>
-        <p>{t.sec2Text}</p>
-        <div className="formula highlight" dangerouslySetInnerHTML={{__html: t.sec2Formula}} />
-        <h3>{t.sec3Title}</h3>
-        <p>{t.sec3Text}</p>
-        <div className="formula">{t.sec3Formula1}</div>
-        <div className="formula">{t.sec3Formula2}</div>
-      </div>
-
-      <div className="card">
-        <h2>{t.sec4Title}</h2>
-        <div className="formula highlight" style={{ fontSize: '1.4rem' }}>{t.sec4Formula}</div>
-        <p>{t.sec4Text}</p>
-        <div className="info-box example">
-          <span className="info-box-icon">🧪</span>
-          <span>{t.sec4Tip}</span>
+        <div className="card">
+          <h2>{t.sec2Title}</h2>
+          <p>{t.sec2Text}</p>
+          <div className="formula highlight" dangerouslySetInnerHTML={{__html: t.sec2Formula}} />
+          <h3>{t.sec3Title}</h3>
+          <p>{t.sec3Text}</p>
+          <div className="formula">{t.sec3Formula1}</div>
+          <div className="formula">{t.sec3Formula2}</div>
         </div>
-        <div className="info-box physics">
-          <span className="info-box-icon">⚗️</span>
-          <span>{lang==='it'
-            ? 'Calcolo: 1 mol, T = 0°C = 273,15 K, P = 101325 Pa. V = nRT/P = 1 × 8,314 × 273,15 / 101325 = 0,02241 m³ = 22,41 L'
-            : 'Calculation: 1 mol, T = 0°C = 273.15 K, P = 101,325 Pa. V = nRT/P = 1 × 8.314 × 273.15 / 101325 = 0.02241 m³ = 22.41 L'}
-          </span>
-        </div>
-      </div>
 
+        <div className="card">
+          <h2>{t.sec4Title}</h2>
+          <div className="formula highlight" style={{ fontSize: '1.4rem' }}>{t.sec4Formula}</div>
+          <p>{t.sec4Text}</p>
+          <div className="info-box example">
+            <span className="info-box-icon">🧪</span>
+            <span>{t.sec4Tip}</span>
+          </div>
+          <div className="info-box physics">
+            <span className="info-box-icon">⚗️</span>
+            <span>{lang==='it'
+              ? 'Calcolo: 1 mol, T = 0°C = 273,15 K, P = 101325 Pa. V = nRT/P = 1 × 8,314 × 273,15 / 101325 = 0,02241 m³ = 22,41 L'
+              : 'Calculation: 1 mol, T = 0°C = 273.15 K, P = 101,325 Pa. V = nRT/P = 1 × 8.314 × 273.15 / 101325 = 0.02241 m³ = 22.41 L'}
+            </span>
+          </div>
+        </div>
+      </>}
+
+      {show('sim') && (
       <div className="sim-card">
         <h2>🔬 {t.simTitle}</h2>
         <p style={{ fontSize: '0.88rem', color: 'var(--muted)', marginBottom: '1rem' }}>{t.simDesc}</p>
@@ -152,8 +161,10 @@ export default function GasPerfetti() {
           PV = nRT: {(P_Pa * V * 1e-3).toFixed(1)} = {n.toFixed(1)} × 8,314 × {TK} = {(n * R * TK).toFixed(1)} J ✓
         </p>
       </div>
+      )}
 
-      <Quiz title={t.quiz.title} questions={t.quiz.questions} />
+      {show('esercizi') && <Exercises section="gas" />}
+      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} />}
     </>
   )
 }
