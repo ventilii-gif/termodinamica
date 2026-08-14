@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useLang } from '../App'
+import { uiText } from '../uiText'
 
 interface Question {
   q: string
@@ -12,6 +14,8 @@ interface QuizProps {
 }
 
 export default function Quiz({ title, questions }: QuizProps) {
+  const { lang } = useLang()
+  const u = uiText[lang]
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
   const [answers, setAnswers] = useState<(number|null)[]>(Array(questions.length).fill(null))
@@ -47,7 +51,7 @@ export default function Quiz({ title, questions }: QuizProps) {
         <div className="quiz-score">
           <div className="quiz-score-num">{icon} {score}/{questions.length}</div>
           <div className="quiz-score-msg">{pct}%</div>
-          <button className="btn" style={{marginTop:'1rem'}} onClick={reset}>🔄 Riprova / Try again</button>
+          <button className="btn" style={{marginTop:'1rem'}} onClick={reset}>🔄 {lang==='it'?'Riprova':'Try again'}</button>
         </div>
       </div>
     )
@@ -68,14 +72,18 @@ export default function Quiz({ title, questions }: QuizProps) {
           )
         })}
       </div>
-      {answered && <div className="quiz-explanation">💡 {q.exp}</div>}
+      {answered && (
+        <div className="quiz-explanation">
+          <strong>{selected===q.correct ? u.correctFb : u.wrongFb}</strong> {q.exp}
+        </div>
+      )}
       <div className="quiz-nav">
         <span className="quiz-progress">{current+1} / {questions.length}</span>
         <div style={{display:'flex',gap:'0.5rem'}}>
-          {current>0 && <button className="btn btn-ghost" onClick={prev}>← Indietro</button>}
+          {current>0 && <button className="btn btn-ghost" onClick={prev}>← {lang==='it'?'Indietro':'Back'}</button>}
           {answered && (
             <button className="btn" onClick={next}>
-              {current<questions.length-1?'Avanti →':'Risultati 🏁'}
+              {current<questions.length-1?(lang==='it'?'Avanti →':'Next →'):(lang==='it'?'Risultati 🏁':'Results 🏁')}
             </button>
           )}
         </div>
