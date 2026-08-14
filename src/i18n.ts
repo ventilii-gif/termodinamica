@@ -21,7 +21,7 @@ const it = {
     ],
     howItWorks: '🚀 Come funziona questa app',
     howItWorksDesc: 'Ogni argomento è diviso in quattro sotto-schede: Teoria con formule ed esempi, una Simulazione interattiva con cursori e grafici, Esercizi graduati e guidati (facile, medio, difficile, anche con formule inverse) e un Quiz da 10 domande con soluzione immediata e commentata. Alla fine trovi la scheda Test Finale con 20 quesiti riepilogativi e correzione solo al termine.',
-    tip: 'Consiglio: inizia dalla simulazione — muovi i cursori e osserva cosa cambia. La teoria diventerà intuitiva.',
+    tip: 'Consiglio: parti dalla Teoria per le formule, poi passa alla Simulazione per muovere i cursori e vedere cosa cambia; consolida con gli Esercizi guidati e verificati con il Quiz. Quando ti senti pronto, mettiti alla prova con il Test Finale.',
     facts: '✨ Fatti che ti stupiranno',
     factsList: [
       ['🔥', 'Il Sole ha una temperatura superficiale di circa 5.778 K, ma la corona solare supera i 2 milioni di K'],
@@ -184,7 +184,7 @@ const en: typeof it = {
     ],
     howItWorks: '🚀 How this app works',
     howItWorksDesc: 'Each topic is split into four sub-tabs: Theory with formulas and examples, an interactive Simulation with sliders and graphs, graded Guided Exercises (easy, medium, hard, including inverse formulas), and a 10-question Quiz with instant, encouraging feedback. At the end, the Final Test tab has 20 review questions graded only when you finish.',
-    tip: 'Tip: start with the simulation — move the sliders and observe what changes. Theory will become intuitive.',
+    tip: 'Tip: begin with Theory for the formulas, then open the Simulation to move the sliders and see what changes; reinforce with the Guided Exercises and check yourself with the Quiz. When you feel ready, challenge yourself with the Final Test.',
     facts: '✨ Facts that will amaze you',
     factsList: [
       ['🔥', "The Sun's surface temperature is about 5,778 K, but its corona exceeds 2 million K"],
