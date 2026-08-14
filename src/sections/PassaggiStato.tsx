@@ -2,6 +2,10 @@ import { useState, useMemo } from 'react'
 import { i18n } from '../i18n'
 import { useLang } from '../App'
 import Quiz from '../components/Quiz'
+import Exercises from '../components/Exercises'
+import { quizExtra } from '../data/quizExtra'
+
+type SubKey = 'teoria' | 'sim' | 'esercizi' | 'quiz'
 
 const C_ICE = 2.09
 const L_FUS = 334
@@ -118,38 +122,30 @@ function TQGraph({ q: currentQ, lang }: { q: number; lang: 'it' | 'en' }) {
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ background: 'var(--bg)', borderRadius: 8, border: '1px solid var(--border)', display: 'block', width: '100%', margin: '0.75rem 0' }}>
-      {/* grid */}
       {[-40, 0, 100].map(t => (
         <line key={t} x1={PAD.l} y1={ty(t)} x2={W - PAD.r} y2={ty(t)}
           stroke="var(--border)" strokeWidth="1" />
       ))}
-      {/* axes */}
       <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H - PAD.b + 5} stroke="var(--border-bright)" strokeWidth="1.5" />
       <line x1={PAD.l - 5} y1={H - PAD.b} x2={W - PAD.r} y2={H - PAD.b} stroke="var(--border-bright)" strokeWidth="1.5" />
-      {/* T axis labels */}
       <text x={PAD.l - 6} y={ty(0) + 4} textAnchor="end" fill="var(--muted)" fontSize="9">0°</text>
       <text x={PAD.l - 6} y={ty(100) + 4} textAnchor="end" fill="var(--muted)" fontSize="9">100°</text>
       <text x={PAD.l - 6} y={ty(T0) + 4} textAnchor="end" fill="var(--muted)" fontSize="9">{T0}°</text>
-      {/* axis names */}
       <text x={PAD.l + gW / 2} y={H - 5} textAnchor="middle" fill="var(--muted)" fontSize="9">
         {lang === 'it' ? 'Calore aggiunto (kJ)' : 'Heat added (kJ)'}
       </text>
       <text x={10} y={PAD.t + gH / 2} textAnchor="middle" fill="var(--muted)" fontSize="9"
         transform={`rotate(-90,10,${PAD.t + gH / 2})`}>T (°C)</text>
-      {/* plateau labels */}
       <text x={qx((Q1 + Q2) / 2)} y={ty(0) - 7} textAnchor="middle" fill="#f57c00" fontSize="8" fontWeight="600">
         {lang === 'it' ? 'Fusione (334 kJ/kg)' : 'Melting (334 kJ/kg)'}
       </text>
       <text x={qx((Q3 + Q4) / 2)} y={ty(100) - 7} textAnchor="middle" fill="#c62828" fontSize="8" fontWeight="600">
         {lang === 'it' ? 'Ebollizione (2260 kJ/kg)' : 'Boiling (2260 kJ/kg)'}
       </text>
-      {/* curve */}
       <path d={pathD} fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinejoin="round" />
-      {/* current position */}
       <line x1={curX} y1={PAD.t} x2={curX} y2={H - PAD.b}
         stroke="var(--muted)" strokeWidth="1" strokeDasharray="3,3" opacity="0.5" />
       <circle cx={curX} cy={curY} r={5} fill="var(--surface)" stroke="var(--primary)" strokeWidth="2" />
-      {/* Q scale ticks */}
       {[Q1, Q2, Q3, Q4].map((q, i) => (
         <line key={i} x1={qx(q)} y1={H - PAD.b} x2={qx(q)} y2={H - PAD.b + 5}
           stroke="var(--border-bright)" strokeWidth="1" />
@@ -158,41 +154,46 @@ function TQGraph({ q: currentQ, lang }: { q: number; lang: 'it' | 'en' }) {
   )
 }
 
-export default function PassaggiStato() {
+export default function PassaggiStato({ sub }: { sub?: SubKey }) {
   const { lang } = useLang()
   const t = i18n[lang].passaggiStato
   const [q, setQ] = useState(200)
+  const show = (s: SubKey) => !sub || sub === s
 
   const temp = tempFromQ(q)
   const stato = stateFromQ(q, lang)
+  const quizQs = [...t.quiz.questions, ...quizExtra[lang].passaggi]
 
   return (
     <>
-      <div className="card">
-        <h2>{t.title}</h2>
-        <h3>{t.sec1Title}</h3>
-        <p>{t.sec1Text}</p>
-      </div>
-
-      <div className="card">
-        <h2>{t.sec2Title}</h2>
-        <p>{t.sec2Text}</p>
-        <div className="formula highlight">{t.sec2Formula}</div>
-        <div className="info-box example">
-          <span className="info-box-icon">📊</span>
-          <span>{t.sec2Values}</span>
+      {show('teoria') && <>
+        <div className="card">
+          <h2>{t.title}</h2>
+          <h3>{t.sec1Title}</h3>
+          <p>{t.sec1Text}</p>
         </div>
-      </div>
 
-      <div className="card">
-        <h2>{t.sec3Title}</h2>
-        <p>{t.sec3Text}</p>
-        <div className="info-box warn">
-          <span className="info-box-icon">⚠️</span>
-          <span>{t.sec3Tip}</span>
+        <div className="card">
+          <h2>{t.sec2Title}</h2>
+          <p>{t.sec2Text}</p>
+          <div className="formula highlight">{t.sec2Formula}</div>
+          <div className="info-box example">
+            <span className="info-box-icon">📊</span>
+            <span>{t.sec2Values}</span>
+          </div>
         </div>
-      </div>
 
+        <div className="card">
+          <h2>{t.sec3Title}</h2>
+          <p>{t.sec3Text}</p>
+          <div className="info-box warn">
+            <span className="info-box-icon">⚠️</span>
+            <span>{t.sec3Tip}</span>
+          </div>
+        </div>
+      </>}
+
+      {show('sim') && (
       <div className="sim-card">
         <h2>🔬 {t.simTitle}</h2>
         <p style={{ fontSize: '0.88rem', color: 'var(--muted)', marginBottom: '1rem' }}>{t.simDesc}</p>
@@ -247,8 +248,10 @@ export default function PassaggiStato() {
           </span>
         </div>
       </div>
+      )}
 
-      <Quiz title={t.quiz.title} questions={t.quiz.questions} />
+      {show('esercizi') && <Exercises section="passaggi" />}
+      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} />}
     </>
   )
 }

@@ -2,6 +2,10 @@ import { useState } from 'react'
 import { i18n } from '../i18n'
 import { useLang } from '../App'
 import Quiz from '../components/Quiz'
+import Exercises from '../components/Exercises'
+import { quizExtra } from '../data/quizExtra'
+
+type SubKey = 'teoria' | 'sim' | 'esercizi' | 'quiz'
 
 function lerp(a: number, b: number, t: number) { return a + (b - a) * t }
 
@@ -28,17 +32,13 @@ function ThermometerSVG({ celsius }: { celsius: number }) {
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ maxWidth: 160, margin: '0 auto', display: 'block', background: 'var(--bg)', borderRadius: 10, border: '1px solid var(--border)' }}>
-      {/* bulb */}
       <circle cx={tubeX + tubeW/2} cy={tubeBottom + 20} r={18} fill={color} stroke="rgba(0,0,0,0.15)" strokeWidth="1.5" />
-      {/* tube outline */}
       <rect x={tubeX} y={tubeTop} width={tubeW} height={tubeH + 2} rx={tubeW/2}
         fill="var(--formula-bg)" stroke="var(--border-bright)" strokeWidth="1.5" />
-      {/* mercury fill */}
       {fillH > 0 && (
         <rect x={tubeX + 2} y={fillY} width={tubeW - 4} height={fillH}
           rx={(tubeW - 4) / 2} fill={color} />
       )}
-      {/* ticks */}
       {ticks.map(([c, label]) => {
         const y = tubeBottom - ((c - minC) / (maxC - minC)) * tubeH
         return (
@@ -49,20 +49,21 @@ function ThermometerSVG({ celsius }: { celsius: number }) {
           </g>
         )
       })}
-      {/* current value indicator */}
       <line x1={tubeX - 5} y1={fillY} x2={tubeX + tubeW + 5} y2={fillY}
         stroke={color} strokeWidth="2" strokeLinecap="round" />
     </svg>
   )
 }
 
-export default function TemperaturaCalore() {
+export default function TemperaturaCalore({ sub }: { sub?: SubKey }) {
   const { lang } = useLang()
   const t = i18n[lang].temperaturaCalore
   const [celsius, setCelsius] = useState(20)
+  const show = (s: SubKey) => !sub || sub === s
 
   const kelvin = celsius + 273.15
   const fahrenheit = celsius * 9/5 + 32
+  const quizQs = [...t.quiz.questions, ...quizExtra[lang].temperatura]
 
   const notevoli: [number, string][] = [
     [-273.15, lang==='it'?'Zero assoluto':'Absolute zero'],
@@ -75,45 +76,48 @@ export default function TemperaturaCalore() {
 
   return (
     <>
-      <div className="card">
-        <h2>{t.title}</h2>
-        <h3>{t.sec1Title}</h3>
-        <p>{t.sec1Text}</p>
-        <div className="info-box tip">
-          <span className="info-box-icon">💡</span>
-          <span>{t.sec1Tip}</span>
+      {show('teoria') && <>
+        <div className="card">
+          <h2>{t.title}</h2>
+          <h3>{t.sec1Title}</h3>
+          <p>{t.sec1Text}</p>
+          <div className="info-box tip">
+            <span className="info-box-icon">💡</span>
+            <span>{t.sec1Tip}</span>
+          </div>
         </div>
-      </div>
 
-      <div className="card">
-        <h2>{t.sec2Title}</h2>
-        <p>{t.sec2Text}</p>
-        <div className="formula highlight">{t.sec2Formula1}</div>
-        <div className="formula highlight">{t.sec2Formula2}</div>
-        <div className="formula highlight">{t.sec2Formula3}</div>
-        <div className="info-box example">
-          <span className="info-box-icon">🌡️</span>
-          <span>{lang==='it'
-            ? 'Corpo umano: 37°C = 310 K = 98,6°F — Ebollizione acqua: 100°C = 373 K = 212°F — Zero assoluto: -273°C = 0 K = -459°F'
-            : 'Human body: 37°C = 310 K = 98.6°F — Water boiling: 100°C = 373 K = 212°F — Absolute zero: -273°C = 0 K = -459°F'}
-          </span>
+        <div className="card">
+          <h2>{t.sec2Title}</h2>
+          <p>{t.sec2Text}</p>
+          <div className="formula highlight">{t.sec2Formula1}</div>
+          <div className="formula highlight">{t.sec2Formula2}</div>
+          <div className="formula highlight">{t.sec2Formula3}</div>
+          <div className="info-box example">
+            <span className="info-box-icon">🌡️</span>
+            <span>{lang==='it'
+              ? 'Corpo umano: 37°C = 310 K = 98,6°F — Ebollizione acqua: 100°C = 373 K = 212°F — Zero assoluto: -273°C = 0 K = -459°F'
+              : 'Human body: 37°C = 310 K = 98.6°F — Water boiling: 100°C = 373 K = 212°F — Absolute zero: -273°C = 0 K = -459°F'}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div className="card">
-        <h2>{t.sec3Title}</h2>
-        <p>{t.sec3Text}</p>
-        <div className="formula highlight">{t.sec3Formula}</div>
-        <div className="info-box example">
-          <span className="info-box-icon">📝</span>
-          <span>{t.sec3Example}</span>
+        <div className="card">
+          <h2>{t.sec3Title}</h2>
+          <p>{t.sec3Text}</p>
+          <div className="formula highlight">{t.sec3Formula}</div>
+          <div className="info-box example">
+            <span className="info-box-icon">📝</span>
+            <span>{t.sec3Example}</span>
+          </div>
+          <div className="info-box warn">
+            <span className="info-box-icon">⚠️</span>
+            <span>{t.sec3Tip}</span>
+          </div>
         </div>
-        <div className="info-box warn">
-          <span className="info-box-icon">⚠️</span>
-          <span>{t.sec3Tip}</span>
-        </div>
-      </div>
+      </>}
 
+      {show('sim') && (
       <div className="sim-card">
         <h2>🔬 {t.simTitle}</h2>
         <p style={{ fontSize: '0.88rem', color: 'var(--muted)', marginBottom: '1rem' }}>{t.simDesc}</p>
@@ -166,8 +170,10 @@ export default function TemperaturaCalore() {
           </div>
         </div>
       </div>
+      )}
 
-      <Quiz title={t.quiz.title} questions={t.quiz.questions} />
+      {show('esercizi') && <Exercises section="temperatura" />}
+      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} />}
     </>
   )
 }
