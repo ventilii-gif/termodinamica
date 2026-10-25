@@ -2,11 +2,15 @@ import { useState } from 'react'
 import { useLang } from '../App'
 import { uiText } from '../uiText'
 import { finalTest } from '../data/finalTest'
+import { sampleN } from '../data/sample'
+
+const DRAW = 20
 
 export default function FinalTest() {
   const { lang } = useLang()
   const u = uiText[lang]
-  const questions = finalTest[lang]
+  // Estrae a caso 20 quesiti dal pool completo; ri-sorteggiati a ogni "Riprova".
+  const [questions, setQuestions] = useState(() => sampleN(finalTest[lang], DRAW))
 
   const [started, setStarted] = useState(false)
   const [current, setCurrent] = useState(0)
@@ -21,8 +25,10 @@ export default function FinalTest() {
     else setDone(true)
   }
   function reset() {
+    const fresh = sampleN(finalTest[lang], DRAW)
+    setQuestions(fresh)
     setStarted(false); setCurrent(0); setDone(false)
-    setAnswers(Array(questions.length).fill(null))
+    setAnswers(Array(fresh.length).fill(null))
   }
 
   const score = answers.filter((a, i) => a === questions[i].correct).length

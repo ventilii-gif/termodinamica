@@ -164,7 +164,7 @@ export default function GasPerfetti({ sub }: { sub?: SubKey }) {
       )}
 
       {show('esercizi') && <Exercises section="gas" />}
-      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} />}
+      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} draw={10} />}
     </>
   )
 }

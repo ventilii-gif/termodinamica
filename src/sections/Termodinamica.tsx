@@ -236,7 +236,7 @@ export default function Termodinamica({ sub }: { sub?: SubKey }) {
       )}
 
       {show('esercizi') && <Exercises section="termo" />}
-      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} />}
+      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} draw={10} />}
     </>
   )
 }

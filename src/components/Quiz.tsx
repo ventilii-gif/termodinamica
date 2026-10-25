@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLang } from '../App'
 import { uiText } from '../uiText'
+import { sampleN } from '../data/sample'
 
 interface Question {
   q: string
@@ -11,16 +12,19 @@ interface Question {
 interface QuizProps {
   title: string
   questions: readonly Question[]
+  draw?: number
 }
 
-export default function Quiz({ title, questions }: QuizProps) {
+export default function Quiz({ title, questions, draw }: QuizProps) {
   const { lang } = useLang()
   const u = uiText[lang]
+  // Estrae a caso `draw` domande dal pool; ri-sorteggiate a ogni "Riprova".
+  const [quizSet, setQuizSet] = useState<readonly Question[]>(() => sampleN(questions, draw ?? questions.length))
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
-  const [answers, setAnswers] = useState<(number|null)[]>(Array(questions.length).fill(null))
+  const [answers, setAnswers] = useState<(number|null)[]>(Array(quizSet.length).fill(null))
   const [done, setDone] = useState(false)
-  const q = questions[current]
+  const q = quizSet[current]
   const answered = selected !== null
 
   function pick(i: number) {
@@ -29,27 +33,29 @@ export default function Quiz({ title, questions }: QuizProps) {
     const next = [...answers]; next[current] = i; setAnswers(next)
   }
   function next() {
-    if (current < questions.length - 1) { setCurrent(c=>c+1); setSelected(answers[current+1]) }
+    if (current < quizSet.length - 1) { setCurrent(c=>c+1); setSelected(answers[current+1]) }
     else setDone(true)
   }
   function prev() {
     if (current > 0) { setCurrent(c=>c-1); setSelected(answers[current-1]) }
   }
   function reset() {
+    const fresh = sampleN(questions, draw ?? questions.length)
+    setQuizSet(fresh)
     setCurrent(0); setSelected(null)
-    setAnswers(Array(questions.length).fill(null)); setDone(false)
+    setAnswers(Array(fresh.length).fill(null)); setDone(false)
   }
 
-  const score = answers.filter((a,i) => a === questions[i].correct).length
+  const score = answers.filter((a,i) => a === quizSet[i].correct).length
 
   if (done) {
-    const pct = Math.round(score/questions.length*100)
+    const pct = Math.round(score/quizSet.length*100)
     const icon = pct===100?'🏆':pct>=67?'⭐':'💪'
     return (
       <div className="quiz-card">
         <div className="quiz-title">{title}</div>
         <div className="quiz-score">
-          <div className="quiz-score-num">{icon} {score}/{questions.length}</div>
+          <div className="quiz-score-num">{icon} {score}/{quizSet.length}</div>
           <div className="quiz-score-msg">{pct}%</div>
           <button className="btn" style={{marginTop:'1rem'}} onClick={reset}>🔄 {lang==='it'?'Riprova':'Try again'}</button>
         </div>
@@ -78,12 +84,12 @@ export default function Quiz({ title, questions }: QuizProps) {
         </div>
       )}
       <div className="quiz-nav">
-        <span className="quiz-progress">{current+1} / {questions.length}</span>
+        <span className="quiz-progress">{current+1} / {quizSet.length}</span>
         <div style={{display:'flex',gap:'0.5rem'}}>
           {current>0 && <button className="btn btn-ghost" onClick={prev}>← {lang==='it'?'Indietro':'Back'}</button>}
           {answered && (
             <button className="btn" onClick={next}>
-              {current<questions.length-1?(lang==='it'?'Avanti →':'Next →'):(lang==='it'?'Risultati 🏁':'Results 🏁')}
+              {current<quizSet.length-1?(lang==='it'?'Avanti →':'Next →'):(lang==='it'?'Risultati 🏁':'Results 🏁')}
             </button>
           )}
         </div>

@@ -173,7 +173,7 @@ export default function TemperaturaCalore({ sub }: { sub?: SubKey }) {
       )}
 
       {show('esercizi') && <Exercises section="temperatura" />}
-      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} />}
+      {show('quiz') && <Quiz title={t.quiz.title} questions={quizQs} draw={10} />}
     </>
   )
 }
